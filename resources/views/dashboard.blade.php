@@ -630,7 +630,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return '$' + value;
+                                return 'KSH ' + value;
                             }
                         }
                     }

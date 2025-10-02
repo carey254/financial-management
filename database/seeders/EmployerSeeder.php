@@ -28,7 +28,7 @@ class EmployerSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'JUJA',
+                'name' => 'RESEARCHER',
                 'contact_person' => null,
                 'email' => null,
                 'phone' => null,
@@ -37,7 +37,7 @@ class EmployerSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'MERU',
+                'name' => 'WHATSAPP DC',
                 'contact_person' => null,
                 'email' => null,
                 'phone' => null,

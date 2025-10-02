@@ -428,14 +428,14 @@
                             <label for="macflex" class="employer-label">MACFLEX</label>
                         </div>
                         <div class="employer-option">
-                            <input type="radio" id="juja" name="employer" value="JUJA" 
-                                   {{ old('employer', $task->employer) == 'JUJA' ? 'checked' : '' }} required>
-                            <label for="juja" class="employer-label">JUJA</label>
+                            <input type="radio" id="researcher" name="employer" value="RESEARCHER" 
+                                   {{ old('employer', $task->employer) == 'RESEARCHER' ? 'checked' : '' }} required>
+                            <label for="researcher" class="employer-label">RESEARCHER</label>
                         </div>
                         <div class="employer-option">
-                            <input type="radio" id="meru" name="employer" value="MERU" 
-                                   {{ old('employer', $task->employer) == 'MERU' ? 'checked' : '' }} required>
-                            <label for="meru" class="employer-label">MERU</label>
+                            <input type="radio" id="whatsapp-dc" name="employer" value="WHATSAPP DC" 
+                                   {{ old('employer', $task->employer) == 'WHATSAPP DC' ? 'checked' : '' }} required>
+                            <label for="whatsapp-dc" class="employer-label">WHATSAPP DC</label>
                         </div>
                     </div>
                 </div>
@@ -456,6 +456,13 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="deadline">Deadline (Optional)</label>
+                        <input type="datetime-local" id="deadline" name="deadline" class="form-control"
+                               value="{{ old('deadline', optional($task->deadline)->format('Y-m-d\\TH:i')) }}"
+                               placeholder="Select deadline and time">
+                    </div>
+
+                    <div class="form-group">
                         <label for="pages">Number of Pages</label>
                         <input type="number" id="pages" name="pages" class="form-control" 
                                value="{{ old('pages', $task->pages) }}" min="1" max="1000" 
@@ -463,7 +470,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="rate">Rate per Page ($)</label>
+                        <label for="rate">Rate per Page (KSH)</label>
                         <input type="number" id="rate" name="rate" class="form-control" 
                                value="{{ old('rate', $task->rate) }}" min="0" step="0.01" max="1000" 
                                placeholder="e.g., 3.50" required onchange="calculateAmount()">
@@ -523,16 +530,18 @@
                     <a href="{{ route('tasks.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Cancel
                     </a>
-                    <form method="POST" action="{{ route('tasks.destroy', $task) }}" 
-                          style="display: inline;" 
-                          onsubmit="return confirm('Are you sure you want to delete this task? This action cannot be undone.')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Delete Task
-                        </button>
-                    </form>
                 </div>
+            </form>
+
+            <!-- Separate Delete Form (must not be nested inside the update form) -->
+            <form method="POST" action="{{ route('tasks.destroy', $task) }}" 
+                  onsubmit="return confirm('Are you sure you want to delete this task? This action cannot be undone.')"
+                  style="margin-top: 10px; text-align: center;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Task
+                </button>
             </form>
         </div>
     </div>
@@ -544,8 +553,8 @@
             const total = pages * rate;
 
             document.getElementById('displayPages').textContent = pages.toLocaleString();
-            document.getElementById('displayRate').textContent = '$' + rate.toFixed(2);
-            document.getElementById('displayTotal').textContent = '$' + total.toFixed(2);
+            document.getElementById('displayRate').textContent = 'KSH ' + rate.toFixed(2);
+            document.getElementById('displayTotal').textContent = 'KSH ' + total.toFixed(2);
         }
 
         // Calculate on page load
@@ -562,7 +571,7 @@
 
             if (!employer) {
                 e.preventDefault();
-                alert('Please select an employer (MACFLEX, JUJA, or MERU)');
+                alert('Please select an employer (MACFLEX, RESEARCHER, or WHATSAPP DC)');
                 return;
             }
 

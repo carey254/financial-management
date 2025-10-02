@@ -3,11 +3,11 @@
 ## 🎯 **How Your Platform Works - Complete Integration**
 
 ### **1. TASKS MODULE - Your Income Source**
-**Purpose**: Track work from your 3 employers (MACFLEX, JUJA, MERU)
+**Purpose**: Track work from your 3 employers (MACFLEX, RESEARCHER, WHATSAPP DC)
 
 **Workflow**:
 1. **Add Task**: Enter work details
-   - Employer: MACFLEX/JUJA/MERU
+   - Employer: MACFLEX/RESEARCHER/WHATSAPP DC
    - Pages worked: e.g., 50 pages
    - Rate per page: e.g., $2.50
    - Date: When work was done
@@ -80,8 +80,8 @@
 **Week 2**: 
 2. **Add Tasks**: Record work done
    - MACFLEX: 100 pages × $2.50 = $250
-   - JUJA: 80 pages × $3.00 = $240
-   - MERU: 120 pages × $2.00 = $240
+   - RESEARCHER: 80 pages × $3.00 = $240
+   - WHATSAPP DC: 120 pages × $2.00 = $240
 
 **Week 3**: 
 3. **Track Expenses**: Record actual spending

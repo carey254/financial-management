@@ -6,23 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dateTime('deadline')->nullable()->after('date');
+            $table->dateTime('deadline_reminder_sent_at')->nullable()->after('deadline');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->dropColumn('deadline');
+            $table->dropColumn('deadline_reminder_sent_at');
         });
     }
 };

@@ -21,6 +21,18 @@ class DebugController extends Controller
         $allBudgets = Budget::where('user_id', $user->id)->get();
         $allTasks = Task::where('user_id', $user->id)->get();
         $allExpenses = Expense::where('user_id', $user->id)->get();
+
+        // Distinct employer names from tasks (string column) and employers table
+        $taskEmployers = Task::where('user_id', $user->id)
+            ->whereNotNull('employer')
+            ->select('employer')
+            ->distinct()
+            ->pluck('employer');
+        $employersTable = \DB::table('employers')
+            ->where('user_id', $user->id)
+            ->select('name')
+            ->orderBy('name')
+            ->pluck('name');
         
         // Current month data
         $currentMonth = now()->month;
@@ -42,6 +54,8 @@ class DebugController extends Controller
             'all_budgets' => $allBudgets->toArray(),
             'current_budgets' => $currentBudgets->toArray(),
             'budget_months' => $allBudgets->pluck('month', 'year')->unique(),
+            'distinct_task_employers' => $taskEmployers,
+            'employers_table_names' => $employersTable,
         ]);
     }
 }

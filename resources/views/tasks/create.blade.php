@@ -464,7 +464,7 @@
                         <div class="employer-selection">
                             @php
                                 // Get default employers or create fallback options
-                                $defaultEmployerNames = ['JUJA', 'MACFLEX', 'MERU'];
+                                $defaultEmployerNames = ['RESEARCHER', 'MACFLEX', 'WHATSAPP DC'];
                                 $defaultEmployers = collect();
                                 
                                 foreach($defaultEmployerNames as $name) {
@@ -485,10 +485,15 @@
                             
                             @foreach($defaultEmployers as $employer)
                                 <div class="employer-option">
-                                    <input type="radio" id="employer_{{ $employer->id }}" name="employer_id" 
+                                    @php
+                                        $slugId = is_numeric($employer->id)
+                                            ? $employer->id
+                                            : \Illuminate\Support\Str::slug($employer->id);
+                                    @endphp
+                                    <input type="radio" id="employer_{{ $slugId }}" name="employer_id" 
                                            value="{{ $employer->id }}" 
                                            {{ old('employer_id') == $employer->id ? 'checked' : '' }}>
-                                    <label for="employer_{{ $employer->id }}" class="employer-label">
+                                    <label for="employer_{{ $slugId }}" class="employer-label">
                                         <strong>{{ $employer->name }}</strong>
                                     </label>
                                 </div>
@@ -498,7 +503,7 @@
                     
                     <!-- Additional Employers Dropdown -->
                     @php
-                        $additionalEmployers = $employers->whereNotIn('name', ['JUJA', 'MACFLEX', 'MERU']);
+                        $additionalEmployers = $employers->whereNotIn('name', ['RESEARCHER', 'MACFLEX', 'WHATSAPP DC']);
                     @endphp
                     
                     @if($additionalEmployers->count() > 0)
@@ -556,6 +561,12 @@
                         <label for="date">Date</label>
                         <input type="date" id="date" name="date" class="form-control" 
                                value="{{ old('date', date('Y-m-d')) }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadline">Deadline (Optional)</label>
+                        <input type="datetime-local" id="deadline" name="deadline" class="form-control"
+                               value="{{ old('deadline') }}" placeholder="Select deadline and time">
                     </div>
 
                     <div class="form-group">

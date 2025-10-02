@@ -17,11 +17,15 @@ class Task extends Model
         'amount',
         'status',
         'date',
+        'deadline',
+        'deadline_reminder_sent_at',
         'notes'
     ];
 
     protected $casts = [
         'date' => 'date',
+        'deadline' => 'datetime',
+        'deadline_reminder_sent_at' => 'datetime',
         'amount' => 'decimal:2',
         'rate' => 'decimal:2',
         'pages' => 'integer'

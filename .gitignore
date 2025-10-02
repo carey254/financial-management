@@ -22,3 +22,12 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=carenjeruto77@gmail.com
+MAIL_PASSWORD=nwdbmbzdfpsxovvn
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS=carenjeruto77@gmail.com
+MAIL_FROM_NAME="${APP_NAME}"

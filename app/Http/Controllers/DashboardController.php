@@ -58,7 +58,7 @@ class DashboardController extends Controller
 
         // Get employer breakdown with detailed analytics
         $employerAnalytics = [];
-        $employers = ['MACFLEX', 'JUJA', 'MERU'];
+        $employers = ['MACFLEX', 'RESEARCHER', 'WHATSAPP DC'];
         foreach ($employers as $employer) {
             $employerTasks = $tasks->where('employer', $employer);
             $employerPrevTasks = $prevTasks->where('employer', $employer);

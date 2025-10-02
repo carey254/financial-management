@@ -44,13 +44,13 @@ class TaskController extends Controller
                 'total_pages' => 0,
                 'task_count' => 0
             ],
-            'JUJA' => [
+            'RESEARCHER' => [
                 'total_income' => 0,
                 'pending_amount' => 0,
                 'total_pages' => 0,
                 'task_count' => 0
             ],
-            'MERU' => [
+            'WHATSAPP DC' => [
                 'total_income' => 0,
                 'pending_amount' => 0,
                 'total_pages' => 0,
@@ -103,7 +103,7 @@ class TaskController extends Controller
     {
         // Get user's active employers for validation
         $userEmployers = auth()->user()->employers()->active()->pluck('id')->toArray();
-        $fallbackEmployers = ['juja', 'macflex', 'meru'];
+        $fallbackEmployers = ['researcher', 'macflex', 'whatsapp dc'];
         $validEmployers = array_merge($userEmployers, $fallbackEmployers);
         
         // Custom validation for employer_id (can be existing ID, fallback name, or new employer)
@@ -129,6 +129,7 @@ class TaskController extends Controller
             'rate' => 'required|numeric|min:0|max:1000',
             'status' => 'required|in:pending,paid',
             'date' => 'required|date',
+            'deadline' => 'nullable|date',
             'notes' => 'nullable|string|max:1000'
         ]);
         
@@ -148,7 +149,7 @@ class TaskController extends Controller
             // Don't set employerId - leave as null for new employers
             
         } elseif (in_array($request->employer_id, $fallbackEmployers)) {
-            // Handle fallback employers (juja, macflex, meru)
+            // Handle fallback employers (researcher, macflex, whatsapp dc)
             $employerName = strtoupper($request->employer_id);
             
             // Try to find or create the employer in database
@@ -185,6 +186,7 @@ class TaskController extends Controller
             'amount' => $amount,
             'status' => $request->status,
             'date' => $request->date,
+            'deadline' => $request->deadline,
             'notes' => $request->notes
         ]);
         
@@ -212,12 +214,13 @@ class TaskController extends Controller
         }
         
         $validator = Validator::make($request->all(), [
-            'employer' => 'required|in:MACFLEX,JUJA,MERU',
+            'employer' => 'required|in:MACFLEX,RESEARCHER,WHATSAPP DC',
             'task_description' => 'required|string|max:500',
             'pages' => 'required|integer|min:1|max:1000',
             'rate' => 'required|numeric|min:0|max:1000',
             'status' => 'required|in:pending,paid',
             'date' => 'required|date',
+            'deadline' => 'nullable|date',
             'notes' => 'nullable|string|max:1000'
         ]);
         
@@ -238,6 +241,7 @@ class TaskController extends Controller
             'amount' => $amount,
             'status' => $request->status,
             'date' => $request->date,
+            'deadline' => $request->deadline,
             'notes' => $request->notes
         ]);
         
@@ -275,8 +279,8 @@ class TaskController extends Controller
             
         $employerData = [
             'MACFLEX' => ['paid' => 0, 'pending' => 0],
-            'JUJA' => ['paid' => 0, 'pending' => 0],
-            'MERU' => ['paid' => 0, 'pending' => 0]
+            'RESEARCHER' => ['paid' => 0, 'pending' => 0],
+            'WHATSAPP DC' => ['paid' => 0, 'pending' => 0]
         ];
         
         foreach ($tasks as $task) {
@@ -286,5 +290,62 @@ class TaskController extends Controller
         }
         
         return response()->json($employerData);
+    }
+
+    // Export tasks as CSV using current filters
+    public function export(Request $request)
+    {
+        $currentMonth = $request->get('month', now()->month);
+        $currentYear = now()->year;
+        $employerFilter = $request->get('employer');
+        $statusFilter = $request->get('status');
+
+        $monthStart = Carbon::create($currentYear, $currentMonth, 1)->startOfMonth();
+        $monthEnd = Carbon::create($currentYear, $currentMonth, 1)->endOfMonth();
+
+        $query = Task::where('user_id', auth()->id())
+            ->whereBetween('date', [$monthStart, $monthEnd])
+            ->orderBy('date', 'desc');
+
+        if ($employerFilter) {
+            $query->where('employer', $employerFilter);
+        }
+        if ($statusFilter) {
+            $query->where('status', $statusFilter);
+        }
+
+        $tasks = $query->get();
+
+        $filename = sprintf('tasks_%s_%d.csv', strtolower(Carbon::create(null, $currentMonth, 1)->format('F')), $currentYear);
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'no-store, no-cache',
+        ];
+
+        return response()->streamDownload(function () use ($tasks) {
+            $handle = fopen('php://output', 'w');
+            // UTF-8 BOM for Excel compatibility
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // Header row
+            fputcsv($handle, ['Date', 'Employer', 'Task Description', 'Pages', 'Rate (KSH)', 'Amount (KSH)', 'Status', 'Deadline']);
+
+            foreach ($tasks as $task) {
+                fputcsv($handle, [
+                    optional($task->date)->format('Y-m-d'),
+                    $task->employer,
+                    $task->task_description,
+                    $task->pages,
+                    number_format((float)$task->rate, 2, '.', ''),
+                    number_format((float)$task->amount, 2, '.', ''),
+                    $task->status,
+                    optional($task->deadline)->format('Y-m-d H:i'),
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, $headers);
     }
 }

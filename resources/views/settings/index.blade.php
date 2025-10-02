@@ -881,7 +881,7 @@
                             <div class="form-group">
                                 <label for="employer_name">Employer Name *</label>
                                 <input type="text" id="employer_name" name="name" class="form-control" 
-                                       value="{{ old('name') }}" placeholder="e.g., MACFLEX, JUJA, MERU" required>
+                                       value="{{ old('name') }}" placeholder="e.g., MACFLEX, RESEARCHER, WHATSAPP DC" required>
                                 @error('name')
                                     <div class="alert alert-danger">{{ $message }}</div>
                                 @enderror

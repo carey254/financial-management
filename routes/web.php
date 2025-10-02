@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\DashboardController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\UserSettingsController;
+use App\Http\Controllers\Auth\PasswordResetController;
 
 // Landing page with authentication
 Route::get('/', function () {
@@ -25,6 +27,28 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/auth/check', [LoginController::class, 'checkAuth'])->name('auth.check');
 
+// Password Reset Routes
+Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
+
+// Secure cron endpoint for external scheduler (Render cron or cron-job.org)
+Route::get('/cron/deadline-reminders', function (\Illuminate\Http\Request $request) {
+    $token = $request->query('token');
+    $expected = env('CRON_TOKEN');
+    if (!$token || !$expected || !hash_equals($expected, $token)) {
+        abort(403);
+    }
+
+    Artisan::call('tasks:send-deadline-reminders');
+    return response()->json([
+        'ok' => true,
+        'ran' => 'tasks:send-deadline-reminders',
+        'time' => now()->toDateTimeString(),
+    ]);
+})->name('cron.deadline_reminders');
+
 // Protected routes (require authentication)
 Route::middleware('auth')->group(function () {
     // Dashboard
@@ -32,6 +56,7 @@ Route::middleware('auth')->group(function () {
     
     // Tasks
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/export', [TaskController::class, 'export'])->name('tasks.export');
     Route::get('/tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');

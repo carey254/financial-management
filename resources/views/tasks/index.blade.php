@@ -340,6 +340,28 @@
             color: #9c4221;
         }
 
+        /* Due/Aging badges */
+        .due-badge {
+            padding: 5px 10px;
+            border-radius: 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .due-overdue { background: #fed7d7; color: #9b2c2c; }
+        .due-today { background: #fff3cd; color: #856404; }
+        .due-tomorrow { background: #e6fffa; color: #234e52; }
+        .due-future { background: #ebf8ff; color: #2b6cb0; }
+        .due-none { background: #edf2f7; color: #4a5568; }
+
+        /* Aging chips summary */
+        .aging-summary { display:flex; flex-wrap:wrap; gap:10px; margin: 10px 0 20px 0; }
+        .aging-chip { padding:8px 12px; border-radius:18px; font-size:0.8rem; font-weight:700; background:#f7fafc; color:#4a5568; border:1px solid #e2e8f0; }
+        .aging-chip i { margin-right:6px; }
+
         .employer-badge {
             padding: 5px 12px;
             border-radius: 20px;
@@ -352,11 +374,11 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
         }
 
-        .employer-juja {
+        .employer-researcher {
             background: linear-gradient(135deg, #48bb78, #38a169);
         }
 
-        .employer-meru {
+        .employer-whatsapp-dc {
             background: linear-gradient(135deg, #ed8936, #dd6b20);
         }
 
@@ -563,9 +585,14 @@
             <!-- Section Header -->
             <div class="section-header">
                 <h2>Task Management</h2>
-                <a href="{{ route('tasks.create') }}" class="btn-primary">
-                    <i class="fas fa-plus"></i> Add New Task
-                </a>
+                <div style="display:flex; gap:10px;">
+                    <a href="{{ route('tasks.export', ['month' => $currentMonth, 'employer' => $employerFilter, 'status' => $statusFilter]) }}" class="btn-primary" style="background:linear-gradient(135deg,#38a169 0%,#2f855a 100%);">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </a>
+                    <a href="{{ route('tasks.create') }}" class="btn-primary">
+                        <i class="fas fa-plus"></i> Add New Task
+                    </a>
+                </div>
             </div>
 
             <!-- Overall Summary -->
@@ -575,7 +602,7 @@
                 </h3>
                 <div class="overall-summary">
                     <div class="summary-card total-income">
-                        <h3><i class="fas fa-dollar-sign"></i> Total Income</h3>
+                        <h3><i class="fas fa-coins"></i> Total Income</h3>
                         <div class="amount">{{ number_format($totalIncome, 2) }} KSH</div>
                     </div>
                     <div class="summary-card total-pending">
@@ -599,25 +626,45 @@
                     <i class="fas fa-building"></i> Employer Summary
                 </h3>
                 <div class="employer-summary">
+                    @php
+                        $macflex = $employerSummaries['MACFLEX'] ?? [
+                            'total_income' => 0,
+                            'pending_amount' => 0,
+                            'total_pages' => 0,
+                            'task_count' => 0,
+                        ];
+                        $researcher = $employerSummaries['RESEARCHER'] ?? [
+                            'total_income' => 0,
+                            'pending_amount' => 0,
+                            'total_pages' => 0,
+                            'task_count' => 0,
+                        ];
+                        $whatsapp = $employerSummaries['WHATSAPP DC'] ?? [
+                            'total_income' => 0,
+                            'pending_amount' => 0,
+                            'total_pages' => 0,
+                            'task_count' => 0,
+                        ];
+                    @endphp
                     <div class="employer-card">
                         <h3>
                             <span class="employer-badge employer-macflex">MACFLEX</span>
                         </h3>
                         <div class="employer-stats">
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MACFLEX']['total_income'], 2) }} KSH</div>
+                                <div class="stat-value">{{ number_format($macflex['total_income'], 2) }} KSH</div>
                                 <div class="stat-label">Paid Income</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MACFLEX']['pending_amount'], 2) }} KSH</div>
+                                <div class="stat-value">{{ number_format($macflex['pending_amount'], 2) }} KSH</div>
                                 <div class="stat-label">Pending</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MACFLEX']['total_pages']) }}</div>
+                                <div class="stat-value">{{ number_format($macflex['total_pages']) }}</div>
                                 <div class="stat-label">Pages</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MACFLEX']['task_count']) }}</div>
+                                <div class="stat-value">{{ number_format($macflex['task_count']) }}</div>
                                 <div class="stat-label">Tasks</div>
                             </div>
                         </div>
@@ -625,23 +672,23 @@
 
                     <div class="employer-card">
                         <h3>
-                            <span class="employer-badge employer-juja">JUJA</span>
+                            <span class="employer-badge employer-researcher">RESEARCHER</span>
                         </h3>
                         <div class="employer-stats">
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['JUJA']['total_income'], 2) }} KSH</div>
+                                <div class="stat-value">{{ number_format($researcher['total_income'], 2) }} KSH</div>
                                 <div class="stat-label">Paid Income</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['JUJA']['pending_amount'], 2) }} KSH</div>
+                                <div class="stat-value">{{ number_format($researcher['pending_amount'], 2) }} KSH</div>
                                 <div class="stat-label">Pending</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['JUJA']['total_pages']) }}</div>
+                                <div class="stat-value">{{ number_format($researcher['total_pages']) }}</div>
                                 <div class="stat-label">Pages</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['JUJA']['task_count']) }}</div>
+                                <div class="stat-value">{{ number_format($researcher['task_count']) }}</div>
                                 <div class="stat-label">Tasks</div>
                             </div>
                         </div>
@@ -649,23 +696,23 @@
 
                     <div class="employer-card">
                         <h3>
-                            <span class="employer-badge employer-meru">MERU</span>
+                            <span class="employer-badge employer-whatsapp-dc">WHATSAPP DC</span>
                         </h3>
                         <div class="employer-stats">
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MERU']['total_income'], 2) }} KSH</div>
+                                <div class="stat-value">{{ number_format($whatsapp['total_income'], 2) }} KSH</div>
                                 <div class="stat-label">Paid Income</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MERU']['pending_amount'], 2) }} KSH</div>
+                                <div class="stat-value">{{ number_format($whatsapp['pending_amount'], 2) }} KSH</div>
                                 <div class="stat-label">Pending</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MERU']['total_pages']) }}</div>
+                                <div class="stat-value">{{ number_format($whatsapp['total_pages']) }}</div>
                                 <div class="stat-label">Pages</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value">{{ number_format($employerSummaries['MERU']['task_count']) }}</div>
+                                <div class="stat-value">{{ number_format($whatsapp['task_count']) }}</div>
                                 <div class="stat-label">Tasks</div>
                             </div>
                         </div>
@@ -678,14 +725,37 @@
                 <select id="employerFilter" onchange="applyFilters()">
                     <option value="">All Employers</option>
                     <option value="MACFLEX" {{ $employerFilter == 'MACFLEX' ? 'selected' : '' }}>MACFLEX</option>
-                    <option value="JUJA" {{ $employerFilter == 'JUJA' ? 'selected' : '' }}>JUJA</option>
-                    <option value="MERU" {{ $employerFilter == 'MERU' ? 'selected' : '' }}>MERU</option>
+                    <option value="RESEARCHER" {{ $employerFilter == 'RESEARCHER' ? 'selected' : '' }}>RESEARCHER</option>
+                    <option value="WHATSAPP DC" {{ $employerFilter == 'WHATSAPP DC' ? 'selected' : '' }}>WHATSAPP DC</option>
                 </select>
                 <select id="statusFilter" onchange="applyFilters()">
                     <option value="">All Status</option>
                     <option value="pending" {{ $statusFilter == 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="paid" {{ $statusFilter == 'paid' ? 'selected' : '' }}>Paid</option>
                 </select>
+            </div>
+
+            <!-- Aging Buckets Summary -->
+            @php
+                $now = \Carbon\Carbon::now();
+                $dueToday = $tasks->filter(function($t) use ($now) {
+                    return $t->status === 'pending' && $t->deadline && $t->deadline->isSameDay($now);
+                })->count();
+                $dueTomorrow = $tasks->filter(function($t) use ($now) {
+                    return $t->status === 'pending' && $t->deadline && $t->deadline->isSameDay($now->copy()->addDay());
+                })->count();
+                $overdue = $tasks->filter(function($t) use ($now) {
+                    return $t->status === 'pending' && $t->deadline && $t->deadline->lt($now);
+                })->count();
+                $future = $tasks->filter(function($t) use ($now) {
+                    return $t->status === 'pending' && $t->deadline && $t->deadline->gt($now->copy()->addDay());
+                })->count();
+            @endphp
+            <div class="aging-summary">
+                <span class="aging-chip"><i class="fas fa-exclamation-triangle" style="color:#e53e3e;"></i> Overdue: {{ $overdue }}</span>
+                <span class="aging-chip"><i class="fas fa-sun" style="color:#dd6b20;"></i> Due Today: {{ $dueToday }}</span>
+                <span class="aging-chip"><i class="fas fa-moon" style="color:#38a169;"></i> Due Tomorrow: {{ $dueTomorrow }}</span>
+                <span class="aging-chip"><i class="fas fa-calendar-alt" style="color:#3182ce;"></i> Future: {{ $future }}</span>
             </div>
 
             <!-- Tasks Table -->
@@ -701,6 +771,7 @@
                                 <th>Rate</th>
                                 <th>Amount</th>
                                 <th>Status</th>
+                                <th>Due</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -709,7 +780,10 @@
                                 <tr>
                                     <td>{{ $task->date->format('M d, Y') }}</td>
                                     <td>
-                                        <span class="employer-badge employer-{{ strtolower($task->employer) }}">
+                                        @php
+                                            $empClass = \Illuminate\Support\Str::slug(strtolower($task->employer));
+                                        @endphp
+                                        <span class="employer-badge employer-{{ $empClass }}">
                                             {{ $task->employer }}
                                         </span>
                                     </td>
@@ -723,12 +797,44 @@
                                         </span>
                                     </td>
                                     <td>
+                                        @php
+                                            $badgeText = 'No deadline';
+                                            $badgeClass = 'due-none';
+                                            if ($task->deadline) {
+                                                $diffInMinutes = \Carbon\Carbon::now()->diffInMinutes($task->deadline, false);
+                                                if ($diffInMinutes < 0) {
+                                                    $daysOver = (int) ceil(abs($diffInMinutes) / 60 / 24);
+                                                    $badgeText = 'Overdue ' . $daysOver . 'd';
+                                                    $badgeClass = 'due-overdue';
+                                                } else {
+                                                    $days = (int) floor($diffInMinutes / 60 / 24);
+                                                    $hours = (int) floor(($diffInMinutes - ($days*24*60)) / 60);
+                                                    if ($days === 0) {
+                                                        $badgeText = 'Due today ~' . $hours . 'h';
+                                                        $badgeClass = 'due-today';
+                                                    } elseif ($days === 1) {
+                                                        $badgeText = 'Due tomorrow';
+                                                        $badgeClass = 'due-tomorrow';
+                                                    } else {
+                                                        $badgeText = 'In ' . $days . 'd';
+                                                        $badgeClass = 'due-future';
+                                                    }
+                                                }
+                                            }
+                                        @endphp
+                                        @php if (!isset($badgeClass) || !isset($badgeText)) { $badgeClass = 'due-none'; $badgeText = 'No deadline'; } @endphp
+                                    <span class="due-badge {{ $badgeClass }}">
+                                            <i class="fas {{ $badgeClass === 'due-overdue' ? 'fa-exclamation-circle' : ($badgeClass === 'due-today' ? 'fa-sun' : ($badgeClass === 'due-tomorrow' ? 'fa-moon' : ($badgeClass === 'due-future' ? 'fa-calendar-alt' : 'fa-clock'))) }}"></i>
+                                            {{ $badgeText }}
+                                        </span>
+                                    </td>
+                                    <td>
                                         <div class="action-buttons">
                                             <a href="{{ route('tasks.edit', $task) }}" class="btn-sm btn-edit">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <form method="POST" action="{{ route('tasks.destroy', $task) }}" 
-                                                  style="display: inline;" 
+                                            <form method="POST" action="{{ route('tasks.destroy', $task) }}"
+                                                  style="display: inline;"
                                                   onsubmit="return confirm('Are you sure you want to delete this task?')">
                                                 @csrf
                                                 @method('DELETE')

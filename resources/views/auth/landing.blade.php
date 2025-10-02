@@ -440,6 +440,11 @@
                     <button type="submit" class="btn-primary">
                         <i class="fas fa-sign-in-alt"></i> Sign In to OBADIA
                     </button>
+                    <div style="text-align:right; margin-top:10px;">
+                        <a href="{{ route('password.request') }}" style="color:#667eea; text-decoration:none;">
+                            Forgot your password?
+                        </a>
+                    </div>
                 </form>
             </div>
 
