@@ -48,7 +48,11 @@ RUN printf "<VirtualHost *:80>\n\
     ErrorLog \\${APACHE_LOG_DIR}/error.log\n\
     CustomLog \\${APACHE_LOG_DIR}/access.log combined\n\
 </VirtualHost>\n" > /etc/apache2/sites-available/000-default.conf \
-    && a2enmod rewrite
+    && a2enmod rewrite \
+    && printf "ServerName localhost\n" > /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername \
+    && printf "<Directory /var/www/>\n    Options Indexes FollowSymLinks\n    AllowOverride All\n    Require all granted\n</Directory>\n" > /etc/apache2/conf-available/laravel-root.conf \
+    && a2enconf laravel-root
 
 # Ensure storage and cache are writable
 RUN chown -R www-data:www-data storage bootstrap/cache \
