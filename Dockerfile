@@ -22,12 +22,18 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files and install deps first (better layer caching)
-COPY composer.json composer.lock* ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# Environment for composer in root
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Copy the rest of the app
+# Copy composer files and pre-install without scripts for layer caching
+COPY composer.json composer.lock* ./
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts
+
+# Copy the full application now (so artisan exists for composer scripts)
 COPY . .
+
+# Run full install to execute scripts (package:discover) and optimize autoload
+RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
 # Use public as the DocumentRoot
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
