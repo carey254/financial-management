@@ -35,10 +35,20 @@ COPY . .
 # Run full install to execute scripts (package:discover) and optimize autoload
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
-# Use public as the DocumentRoot
+# Use public as the DocumentRoot and write a clean vhost
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT%/public/}!g' /etc/apache2/apache2.conf
+RUN printf "<VirtualHost *:80>\n\
+    ServerAdmin webmaster@localhost\n\
+    DocumentRoot ${APACHE_DOCUMENT_ROOT}\n\
+    <Directory ${APACHE_DOCUMENT_ROOT}>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+    ErrorLog \\${APACHE_LOG_DIR}/error.log\n\
+    CustomLog \\${APACHE_LOG_DIR}/access.log combined\n\
+</VirtualHost>\n" > /etc/apache2/sites-available/000-default.conf \
+    && a2enmod rewrite
 
 # Ensure storage and cache are writable
 RUN chown -R www-data:www-data storage bootstrap/cache \

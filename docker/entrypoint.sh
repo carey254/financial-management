@@ -6,6 +6,9 @@ set -euo pipefail
 
 # Configure Apache to listen on provided PORT
 sed -i "s/^Listen .*/Listen ${PORT}/" /etc/apache2/ports.conf || true
+sed -i "s#<VirtualHost \*:80>#<VirtualHost *:${PORT}>#" /etc/apache2/sites-available/000-default.conf || true
+\
+    a2enmod rewrite >/dev/null 2>&1 || true
 
 # Ensure correct permissions
 chown -R www-data:www-data storage bootstrap/cache
